@@ -318,7 +318,7 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       if (!SharedVariables::Exists(thread_ids, options.mutex().name())) {
         LOGF(
             "Could not find mutex declaration. Mutexes must be declared in the global section of "
-            "the .ditto file");
+            "the .txtpb file");
       }
 
       auto mux_key = SharedVariables::GetKey(thread_ids, options.mutex().name());
@@ -337,7 +337,7 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       if (!SharedVariables::Exists(thread_ids, options.mutex().name())) {
         LOGF(
             "Could not find mutex declaration. Mutexes must be declared in the global section of "
-            "the .ditto file");
+            "the .txtpb file");
       }
 
       auto mux_key = SharedVariables::GetKey(thread_ids, options.mutex().name());
@@ -347,11 +347,11 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       break;
     }
     case InstructionType::INSTRUCTION_ONEOF_NOT_SET: {
-      LOGF("Instruction was not set in .ditto file");
+      LOGF("Instruction was not set in .txtpb file");
       break;
     }
     default: {
-      LOGF("Invalid instruction was set in .ditto file");
+      LOGF("Invalid instruction was set in .txtpb file");
     }
   }
 }

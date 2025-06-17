@@ -162,12 +162,12 @@ CmdArguments ParseArguments(int argc, char** argv) {
   }
 
   if (is_embedded && optind < argc) {
-    LOGE("Unexpected both embedded benchmark and .ditto file");
+    LOGE("Unexpected both embedded benchmark and .txtpb file");
     PrintHelpAndExit(argv[0], help_arg);
   }
   if (!is_embedded) {
     if (optind >= argc) {
-      LOGE("Expected either embedded benchmark or .ditto file");
+      LOGE("Expected either embedded benchmark or .txtpb file");
       PrintHelpAndExit(argv[0], help_arg);
     } else {
       arguments.file_path = argv[optind];
