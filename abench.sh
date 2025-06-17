@@ -143,7 +143,7 @@ if [ ! -z "${QUERY_FILE}" ] ; then
     echo "run as a result of setting the PERFETTO_CONFIG parameter"
     exit 1
   fi
-  [ ! which trace_processor_shell ] && m trace_processor_shell
+  which trace_processor_shell &>/dev/null || m trace_processor_shell
   trace_processor_shell -q ${QUERY_FILE} ${TRACE_FILE} | column -t -s ','
 fi
 
