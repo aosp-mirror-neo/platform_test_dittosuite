@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
   std::string absolute_path = argv[2];
 
-  // Initialize .ditto file
+  // Initialize .txtpb file
   auto benchmark = std::make_unique<dittosuiteproto::Benchmark>();
   auto main_instruction_set = benchmark->mutable_main()->mutable_instruction_set();
   benchmark->mutable_global()->set_absolute_path(absolute_path);
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
 
         int fd = strtoll(syscall.return_value.c_str(), nullptr, 10);
 
-        // Create .ditto instruction set for this fd with open file instruction
+        // Create .txtpb instruction set for this fd with open file instruction
         instruction_set_by_fd[fd] = std::make_unique<dittosuiteproto::InstructionSet>();
         auto instruction = instruction_set_by_fd[fd]->add_instructions()->mutable_open_file();
         instruction->set_path_name(path_name);
@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
         int64_t size = strtoll(syscall.arguments[2].c_str(), nullptr, 10);
         int64_t offset = strtoll(syscall.arguments[3].c_str(), nullptr, 10);
 
-        // Create .ditto read file instruction
+        // Create .txtpb read file instruction
         auto instruction = instruction_set_by_fd[fd]->add_instructions()->mutable_read_file();
         instruction->set_input_fd("fd");
         instruction->set_size(size);
@@ -189,7 +189,7 @@ int main(int argc, char** argv) {
         int64_t size = strtoll(syscall.arguments[2].c_str(), nullptr, 10);
         int64_t offset = strtoll(syscall.arguments[3].c_str(), nullptr, 10);
 
-        // Create .ditto write file instruction
+        // Create .txtpb write file instruction
         auto instruction = instruction_set_by_fd[fd]->add_instructions()->mutable_write_file();
         instruction->set_input_fd("fd");
         instruction->set_size(size);
@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
 
         if (instruction_set_by_fd.find(fd) == instruction_set_by_fd.end()) continue;
 
-        // Create .ditto close file instruction
+        // Create .txtpb close file instruction
         auto instruction = instruction_set_by_fd[fd]->add_instructions()->mutable_close_file();
         instruction->set_input_fd("fd");
 

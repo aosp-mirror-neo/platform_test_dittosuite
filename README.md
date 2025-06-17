@@ -8,14 +8,14 @@ to, CPU load, memory allocations, file system operations, Binder IPC, that can
 be combined to run sequentially or in parallel.
 
 A new high-level language, Dittolang, defines the workload in the form of a
-textual representation of Protocol Buffers (aka .ditto files).
+textual representation of Protocol Buffers (aka .txtpb files).
 
-The operations defined in the .ditto files are interpreted and executed by
+The operations defined in the .txtpb files are interpreted and executed by
 Dittobench on the target device.
 
 ## Benchmarking
 
-During the Dittobench execution of the instructions defined in the .ditto file,
+During the Dittobench execution of the instructions defined in the .txtpb file,
 the tool tracks performance metrics such as execution time and I/O bandwidth
 (more in the [Sampling](#sampling) section).
 
@@ -31,11 +31,11 @@ $ doxygen
 # How to run
 
 ```
-$ ./dittobench [options] [.ditto file]
+$ ./dittobench [options] [.txtpb file]
 ```
 
-To run a benchmark, a well formed .ditto file must be provided, see section
-[How to write .ditto files](#writing-ditto-files)
+To run a benchmark, a well formed .txtpb file must be provided, see section
+[How to write .txtpb files](#writing-ditto-files)
 In addition, these options can be set:
 
 - `--results-output=<string>` (default: report). Select the results output
@@ -48,11 +48,11 @@ In addition, these options can be set:
 - `--parameters=string`. If the benchmark takes parameters, they can be passed
   through this option, separated by commas.
 
-# Writing .ditto files {#writing-ditto-files}
+# Writing .txtpb files {#writing-ditto-files}
 
 ## Sections
 
-Every .ditto file should begin with this skeleton:
+Every .txtpb file should begin with this skeleton:
 
 ```
 main: {},
@@ -110,7 +110,7 @@ Every workload is composed of one or more instructions.
 
 Almost everything in Ditto `main` itself is an instruction!
 
-Here is an example of a .ditto file.
+Here is an example of a .txtpb file.
 
 ```
 main: {

@@ -18,7 +18,7 @@ file(GLOB libditto_src
 )
 
 file(GLOB_RECURSE ditto_benchmarks
-	example/*.ditto
+	example/*.txtpb
 )
 
 add_custom_command(
