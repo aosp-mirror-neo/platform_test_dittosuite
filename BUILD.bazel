@@ -38,7 +38,7 @@ cc_proto_library(
 
 genrule(
     name = "dittobench_gen_embedded_benchmarks",
-    srcs = glob(["example/**/*.ditto"]),
+    srcs = glob(["example/**/*.txtpb"]),
     outs = ["generated/embedded_benchmarks.cpp"],
     cmd = "./$(location ditto2cpp.py) -s $(SRCS) -o $@",
     tools = ["ditto2cpp.py"],

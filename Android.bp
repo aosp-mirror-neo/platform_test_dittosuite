@@ -56,7 +56,7 @@ cc_defaults {
 filegroup {
     name: "dittobench_benchmark_files",
     srcs: [
-        "example/**/*.ditto",
+        "example/**/*.txtpb",
     ],
 }
 
@@ -105,7 +105,7 @@ cc_benchmark {
         "libutils",
         "liblog",
     ],
-    data: ["example/**/*.ditto"],
+    data: ["example/**/*.txtpb"],
     test_suites: ["device-tests"],
     defaults: ["dittobench_defaults"],
 }
