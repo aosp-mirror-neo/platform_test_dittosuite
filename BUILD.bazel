@@ -53,6 +53,9 @@ cc_library(
     hdrs = glob([
         "include/ditto/*.h",
     ]),
+    defines = [
+        "_LARGEFILE64_SOURCE",
+    ],
     includes = [
         "include",
         "schema",
