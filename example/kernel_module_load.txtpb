@@ -1,0 +1,17 @@
+main: {
+  instruction_set: {
+    instructions:
+    [ {
+      open_file: {
+        path_name: "/system_dlkm/lib/modules/kernel/net/nfc/nfc.ko"
+        output_fd: "module_fd"
+        access_mode: READ_ONLY
+      }
+    }
+      , { kernel_load_module: { input_fd: "module_fd" } }
+      , { kernel_unload_module: { name: "nfc" } }
+      , { close_file: { input_fd: "module_fd" } }]
+  },
+  repeat: 1000
+}
+global: {}

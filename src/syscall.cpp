@@ -115,6 +115,14 @@ int Syscall::UnlockMutex(pthread_mutex_t* mutex) {
   return pthread_mutex_unlock(mutex);
 }
 
+int Syscall::FinitModule(int fd, const char* param_values, int flags) {
+  return syscall(__NR_finit_module, fd, param_values, flags);
+}
+
+int Syscall::DeleteModule(const char* name, int flags) {
+  return syscall(__NR_delete_module, name, flags);
+}
+
 std::string to_string(const SchedAttr__& attr) {
   std::stringstream ss;
   ss << "size: " << attr.size << ", policy: " << attr.sched_policy
