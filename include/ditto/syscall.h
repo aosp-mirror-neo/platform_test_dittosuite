@@ -66,6 +66,8 @@ class SyscallInterface {
   virtual int64_t Write(int fd, char* buf, int64_t count, int64_t offset) = 0;
   virtual int LockMutex(pthread_mutex_t* mutex) = 0;
   virtual int UnlockMutex(pthread_mutex_t* mutex) = 0;
+  virtual int FinitModule(int fd, const char* param_values, int flags) = 0;
+  virtual int DeleteModule(const char* name, int flags) = 0;
 };
 
 class Syscall : public SyscallInterface {
@@ -95,6 +97,8 @@ class Syscall : public SyscallInterface {
   int64_t Write(int fd, char* buf, int64_t count, int64_t offset) override;
   int LockMutex(pthread_mutex_t* mutex) override;
   int UnlockMutex(pthread_mutex_t* mutex) override;
+  int FinitModule(int fd, const char* param_values, int flags) override;
+  int DeleteModule(const char* name, int flags) override;
 
  private:
   Syscall(){};
