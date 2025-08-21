@@ -138,10 +138,11 @@ CmdArguments ParseArguments(int argc, char** argv) {
         dittosuite::Logger::GetInstance().SetLogLevel(ArgToLogLevel(optarg));
         break;
       case 'p': {
-        char* token = strtok(optarg, ",");
+        char* save_ptr;
+        char* token = strtok_r(optarg, ",", &save_ptr);
         while (token != nullptr) {
           arguments.parameters.push_back(token);
-          token = strtok(nullptr, ",");
+          token = strtok_r(nullptr, ",", &save_ptr);
         }
         break;
       }
