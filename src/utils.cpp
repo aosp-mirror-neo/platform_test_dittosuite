@@ -25,6 +25,8 @@ bool operator==(const pthread_mutex_t& a, const pthread_mutex_t& b) {
 
 namespace dittosuite {
 
+const std::string EMPTY_STRING = "";
+
 int64_t GetFileSize(SyscallInterface& syscall, int fd) {
   struct stat64 sb;
   if (syscall.FStat(fd, &sb) == -1) {

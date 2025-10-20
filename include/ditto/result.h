@@ -30,6 +30,14 @@ enum class ResultsOutput { kNull, kReport, kCsv, kPb };
 
 class Result {
  public:
+  struct ColumnWidths {
+    int instruction_name{16};  // "Instruction name"
+    int min{3};                // "Min"
+    int max{3};                // "Max"
+    int mean{4};               // "Mean"
+    int median{6};             // "Median"
+    int sd{2};                 // "SD"
+  };
   struct Statistics {
     double min, max, mean, median, sd;
   };
@@ -74,7 +82,10 @@ class Result {
   void AnalyseMeasurement(const std::string& name);
   std::vector<int> ComputeNormalizedFrequencyVector(const std::string& measurement_name);
   std::set<std::string> GetMeasurementsNames();
-  void PrintStatisticsTableContent(const std::string& instruction_path,
+
+  void CalculateColumnWidths(ColumnWidths& widths, const std::string& instruction_path,
+                             const std::string& measurement_name);
+  void PrintStatisticsTableContent(const ColumnWidths& widths, const std::string& instruction_path,
                                    const std::string& measurement_name);
 
   std::string ComputeNextInstructionPath(const std::string& instruction_path);

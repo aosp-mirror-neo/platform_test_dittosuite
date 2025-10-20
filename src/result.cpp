@@ -26,7 +26,6 @@
 #include <string>
 
 const int kSampleDisplayWidth = 16;  // this width is used displaying a sample value
-const int kTableWidth = 164;  // table width; can be adjusted in case of longer instruction paths
 const char* kTableDivider = " | ";   // table character divider
 const int kMaxHistogramHeight = 20;  // used for normalizing the histogram (represents the
                                      //  maximum height of the histogram)
@@ -88,44 +87,87 @@ void Result::Print(const ResultsOutput results_output, const std::string& instru
   }
 }
 
-void PrintTableBorder() {
-  std::cout << std::setfill('-') << std::setw(kTableWidth) << "" << std::setfill(' ');
-  std::cout << '\n';
+std::string FormatMeasurementValue(int64_t value) {
+  std::ostringstream oss;
+  oss << value;
+  return oss.str();
 }
 
-void PrintStatisticsTableHeader() {
-  std::cout << "\x1b[1m";  // beginning of bold
-  std::cout << '\n';
-  PrintTableBorder();
-  std::cout << "| ";  // beginning of table row
-  std::cout << std::setw(70) << std::left << "Instruction name";
-  std::cout << kTableDivider;
-  std::cout << std::setw(15) << std::right << " Min";
-  std::cout << kTableDivider;
-  std::cout << std::setw(15) << " Max";
-  std::cout << kTableDivider;
-  std::cout << std::setw(15) << " Mean";
-  std::cout << kTableDivider;
-  std::cout << std::setw(15) << " Median";
-  std::cout << kTableDivider;
-  std::cout << std::setw(15) << " SD";
-  std::cout << kTableDivider;
-  std::cout << '\n';
-  PrintTableBorder();
-  std::cout << "\x1b[0m";  // ending of bold
-}
+void Result::CalculateColumnWidths(ColumnWidths& widths, const std::string& instruction_path,
+                                   const std::string& measurement_name) {
+  std::string next_instruction_path = ComputeNextInstructionPath(instruction_path);
+  int subinstruction_level =
+      std::count(next_instruction_path.begin(), next_instruction_path.end(), '/');
+  if (subinstruction_level > 2) {
+    std::size_t first_truncate_pos = next_instruction_path.find('/');
+    next_instruction_path = ".." + next_instruction_path.substr(first_truncate_pos);
+  }
 
-void PrintMeasurementInTable(const int64_t& measurement, const std::string& measurement_name) {
-  if (measurement_name == "duration") {
-    std::cout << std::setw(13) << measurement << "ns";
-  } else if (measurement_name == "bandwidth") {
-    std::cout << std::setw(11) << measurement << "KB/s";
+  widths.instruction_name =
+      std::max(widths.instruction_name, static_cast<int>(next_instruction_path.length()));
+
+  if (samples_.count(measurement_name)) {
+    widths.min = std::max(
+        widths.min,
+        static_cast<int>(FormatMeasurementValue(statistics_[measurement_name].min).length()));
+    widths.max = std::max(
+        widths.max,
+        static_cast<int>(FormatMeasurementValue(statistics_[measurement_name].max).length()));
+    widths.mean = std::max(
+        widths.mean,
+        static_cast<int>(FormatMeasurementValue(statistics_[measurement_name].mean).length()));
+    widths.median = std::max(
+        widths.median,
+        static_cast<int>(FormatMeasurementValue(statistics_[measurement_name].median).length()));
+    widths.sd = std::max(
+        widths.sd,
+        static_cast<int>(FormatMeasurementValue(statistics_[measurement_name].sd).length()));
+  }
+
+  for (const auto& sub_result : sub_results_) {
+    sub_result->CalculateColumnWidths(widths, next_instruction_path, measurement_name);
   }
 }
 
-// Recursive function to print one row at a time
-// of statistics table content (the instruction path, min, max and mean).
-void Result::PrintStatisticsTableContent(const std::string& instruction_path,
+void PrintTableBorder(const Result::ColumnWidths& widths) {
+  int total_width = widths.instruction_name + widths.min + widths.max + widths.mean +
+                    widths.median + widths.sd + 3 * 6 + 1;
+  std::cout << std::setfill('-') << std::setw(total_width) << "" << std::setfill(' ');
+  std::cout << '\n';
+}
+
+void PrintStatisticsTableHeader(const Result::ColumnWidths& widths,
+                                const std::string& measurement_name) {
+  std::string unit;
+  if (measurement_name == "duration") {
+    unit = " (ns)";
+  } else if (measurement_name == "bandwidth") {
+    unit = " (KB/s)";
+  }
+
+  std::cout << "\x1b[1m";  // beginning of bold
+  std::cout << '\n';
+  PrintTableBorder(widths);
+  std::cout << "| ";  // beginning of table row
+  std::cout << std::setw(widths.instruction_name) << std::left << "Instruction name";
+  std::cout << kTableDivider;
+  std::cout << std::setw(widths.min) << std::right << "Min" + unit;
+  std::cout << kTableDivider;
+  std::cout << std::setw(widths.max) << "Max" + unit;
+  std::cout << kTableDivider;
+  std::cout << std::setw(widths.mean) << "Mean" + unit;
+  std::cout << kTableDivider;
+  std::cout << std::setw(widths.median) << "Median" + unit;
+  std::cout << kTableDivider;
+  std::cout << std::setw(widths.sd) << "SD";
+  std::cout << kTableDivider;
+  std::cout << '\n';
+  PrintTableBorder(widths);
+  std::cout << "\x1b[0m";  // ending of bold
+}
+
+void Result::PrintStatisticsTableContent(const ColumnWidths& widths,
+                                         const std::string& instruction_path,
                                          const std::string& measurement_name) {
   std::string next_instruction_path = ComputeNextInstructionPath(instruction_path);
   int subinstruction_level =
@@ -140,25 +182,29 @@ void Result::PrintStatisticsTableContent(const std::string& instruction_path,
   // Print table row
   if (samples_.find(measurement_name) != samples_.end()) {
     std::cout << "| ";  // started new row
-    std::cout << std::setw(70) << std::left << next_instruction_path << std::right;
+    std::cout << std::setw(widths.instruction_name) << std::left << next_instruction_path
+              << std::right;
     std::cout << kTableDivider;
-    PrintMeasurementInTable(statistics_[measurement_name].min, measurement_name);
+    std::cout << std::setw(widths.min) << FormatMeasurementValue(statistics_[measurement_name].min);
     std::cout << kTableDivider;
-    PrintMeasurementInTable(statistics_[measurement_name].max, measurement_name);
+    std::cout << std::setw(widths.max) << FormatMeasurementValue(statistics_[measurement_name].max);
     std::cout << kTableDivider;
-    PrintMeasurementInTable(statistics_[measurement_name].mean, measurement_name);
+    std::cout << std::setw(widths.mean)
+              << FormatMeasurementValue(statistics_[measurement_name].mean);
     std::cout << kTableDivider;
-    PrintMeasurementInTable(statistics_[measurement_name].median, measurement_name);
+    std::cout << std::setw(widths.median)
+              << FormatMeasurementValue(statistics_[measurement_name].median);
     std::cout << kTableDivider;
-    std::cout << std::setw(15)
-              << statistics_[measurement_name].sd;  // SD is always printed without measurement unit
-    std::cout << kTableDivider;                     // ended current row
+    std::cout << std::setw(widths.sd)
+              << FormatMeasurementValue(statistics_[measurement_name]
+                                            .sd);  // SD is always printed without measurement unit
+    std::cout << kTableDivider;                    // ended current row
     std::cout << '\n';
-    PrintTableBorder();
+    PrintTableBorder(widths);
   }
 
   for (const auto& sub_result : sub_results_) {
-    sub_result->PrintStatisticsTableContent(next_instruction_path, measurement_name);
+    sub_result->PrintStatisticsTableContent(widths, next_instruction_path, measurement_name);
   }
 }
 
@@ -181,8 +227,21 @@ void Result::PrintStatisticsTables() {
   std::set<std::string> measurement_names = GetMeasurementsNames();
   for (const auto& s : measurement_names) {
     std::cout << s << " statistics:";
-    PrintStatisticsTableHeader();
-    PrintStatisticsTableContent("", s);
+    ColumnWidths widths;
+    if (s == "duration") {
+      widths.min = 3 + 5;     // "Min" + " (ns)"
+      widths.max = 3 + 5;     // "Max" + " (ns)"
+      widths.mean = 4 + 5;    // "Mean" + " (ns)"
+      widths.median = 6 + 5;  // "Median" + " (ns)"
+    } else if (s == "bandwidth") {
+      widths.min = 3 + 7;     // "Min" + " (KB/s)"
+      widths.max = 3 + 7;     // "Max" + " (KB/s)"
+      widths.mean = 4 + 7;    // "Mean" + " (KB/s)"
+      widths.median = 6 + 7;  // "Median" + " (KB/s)"
+    }
+    CalculateColumnWidths(widths, "", s);
+    PrintStatisticsTableHeader(widths, s);
+    PrintStatisticsTableContent(widths, "", s);
     std::cout << '\n';
   }
 }
@@ -190,11 +249,11 @@ void Result::PrintStatisticsTables() {
 void Result::PrintHistogramHeader(const std::string& measurement_name) {
   if (measurement_name == "duration") {
     std::cout.width(kSampleDisplayWidth - 3);
-    std::cout << "Time(" << time_unit_.name << ") |";
+    std::cout << "Time (" << time_unit_.name << ") |";
     std::cout << " Normalized number of time samples\n";
   } else if (measurement_name == "bandwidth") {
     std::cout.width(kSampleDisplayWidth - 6);
-    std::cout << "Bandwidth(" << bandwidth_unit_.name << ") |";
+    std::cout << "Bandwidth (" << bandwidth_unit_.name << ") |";
     std::cout << " Normalized number of bandwidth samples\n";
   }
   std::cout << std::setfill('-') << std::setw(kMaxHistogramWidth) << "" << std::setfill(' ');
