@@ -39,7 +39,7 @@ void __ditto_files_paths(std::vector<std::string>* ditto_paths, const std::strin
     std::cout << "Found: " << path << std::endl;
     switch (entry->d_type) {
       case DT_REG: {
-        if (string_has_suffix(entry->d_name, ".ditto")) {
+        if (string_has_suffix(entry->d_name, ".txtpb")) {
           ditto_paths->push_back(path);
         }
         break;
@@ -72,8 +72,8 @@ std::vector<std::string> ditto_files_paths() {
 
 class ExampleTest : public testing::TestWithParam<std::string> {};
 
-// Test each .ditto file inside example/ folder to make sure that all of them follow the schema
-// If .ditto is parsed successfully, exit with code 0 is expected
+// Test each .txtpb file inside example/ folder to make sure that all of them follow the schema
+// If .txtpb is parsed successfully, exit with code 0 is expected
 TEST_P(ExampleTest, IsParsable) {
   std::string file_path = GetParam();
   std::cout << "Testing file path: " << GetParam() << std::endl;

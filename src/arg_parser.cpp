@@ -138,10 +138,11 @@ CmdArguments ParseArguments(int argc, char** argv) {
         dittosuite::Logger::GetInstance().SetLogLevel(ArgToLogLevel(optarg));
         break;
       case 'p': {
-        char* token = strtok(optarg, ",");
+        char* save_ptr;
+        char* token = strtok_r(optarg, ",", &save_ptr);
         while (token != nullptr) {
           arguments.parameters.push_back(token);
-          token = strtok(nullptr, ",");
+          token = strtok_r(nullptr, ",", &save_ptr);
         }
         break;
       }
@@ -162,12 +163,12 @@ CmdArguments ParseArguments(int argc, char** argv) {
   }
 
   if (is_embedded && optind < argc) {
-    LOGE("Unexpected both embedded benchmark and .ditto file");
+    LOGE("Unexpected both embedded benchmark and .txtpb file");
     PrintHelpAndExit(argv[0], help_arg);
   }
   if (!is_embedded) {
     if (optind >= argc) {
-      LOGE("Expected either embedded benchmark or .ditto file");
+      LOGE("Expected either embedded benchmark or .txtpb file");
       PrintHelpAndExit(argv[0], help_arg);
     } else {
       arguments.file_path = argv[optind];

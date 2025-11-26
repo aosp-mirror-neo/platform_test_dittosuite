@@ -44,14 +44,14 @@ std::unique_ptr<dittosuiteproto::Benchmark> Parser::__Parse(
     std::string to_replace("$PARAMETER_" + std::to_string(i + 1) + "$");
     auto position = json_benchmark.find(to_replace);
     if (position == std::string::npos) {
-      LOGW(to_replace + " does not exist in .ditto file");
+      LOGW(to_replace + " does not exist in .txtpb file");
       continue;
     }
     json_benchmark.replace(position, to_replace.size(), parameters[i]);
   }
 
   if (!google::protobuf::TextFormat::ParseFromString(json_benchmark, benchmark.get())) {
-    LOGF("Error while parsing .ditto file");
+    LOGF("Error while parsing .txtpb file");
   }
 
   std::list<int> thread_ids({InstructionFactory::GenerateThreadId()});
@@ -95,7 +95,7 @@ std::unique_ptr<dittosuiteproto::Benchmark> Parser::ParseFile(
     const std::string& file_path, const std::vector<std::string>& parameters) {
   std::ifstream file(file_path);
   if (!file.is_open()) {
-    LOGF("Provided .ditto file was not found: " + file_path);
+    LOGF("Provided .txtpb file was not found: " + file_path);
   }
 
   std::string json_benchmark((std::istreambuf_iterator<char>(file)),

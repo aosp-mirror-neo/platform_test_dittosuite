@@ -26,6 +26,7 @@
 #include <ditto/delete_file.h>
 #include <ditto/instruction_set.h>
 #include <ditto/invalidate_cache.h>
+#include <ditto/kernel_module.h>
 #include <ditto/lock.h>
 #include <ditto/logger.h>
 #include <ditto/memory_allocation.h>
@@ -318,7 +319,7 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       if (!SharedVariables::Exists(thread_ids, options.mutex().name())) {
         LOGF(
             "Could not find mutex declaration. Mutexes must be declared in the global section of "
-            "the .ditto file");
+            "the .txtpb file");
       }
 
       auto mux_key = SharedVariables::GetKey(thread_ids, options.mutex().name());
@@ -337,7 +338,7 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       if (!SharedVariables::Exists(thread_ids, options.mutex().name())) {
         LOGF(
             "Could not find mutex declaration. Mutexes must be declared in the global section of "
-            "the .ditto file");
+            "the .txtpb file");
       }
 
       auto mux_key = SharedVariables::GetKey(thread_ids, options.mutex().name());
@@ -346,12 +347,28 @@ std::unique_ptr<Instruction> InstructionFactory::CreateFromProtoInstruction(
       return std::make_unique<Unlock>(instruction_params, mux);
       break;
     }
+    case InstructionType::kKernelLoadModule: {
+      const auto& options = proto_instruction.kernel_load_module();
+
+      int fd_key = SharedVariables::GetKey(thread_ids, options.input_fd());
+
+      return std::make_unique<KernelLoadModule>(instruction_params, fd_key);
+    }
+    case InstructionType::kKernelUnloadModule: {
+      const auto& options = proto_instruction.kernel_unload_module();
+
+      if (!options.has_name()) {
+        LOGF("Module unloading instruction needs to have a module name.");
+      }
+
+      return std::make_unique<KernelUnloadModule>(instruction_params, options.name());
+    }
     case InstructionType::INSTRUCTION_ONEOF_NOT_SET: {
-      LOGF("Instruction was not set in .ditto file");
+      LOGF("Instruction was not set in .txtpb file");
       break;
     }
     default: {
-      LOGF("Invalid instruction was set in .ditto file");
+      LOGF("Invalid instruction was set in .txtpb file");
     }
   }
 }

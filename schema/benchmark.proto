@@ -227,6 +227,14 @@ message Multithreading {
 
 message InvalidateCache {}
 
+message KernelLoadModule {
+  optional string input_fd = 1;
+}
+
+message KernelUnloadModule {
+  optional string name = 1;
+}
+
 message Instruction {
   optional int32 repeat = 1 [default = 1];
   oneof instruction_oneof {
@@ -247,6 +255,8 @@ message Instruction {
     MemoryAllocate mem_alloc = 17;
     Lock lock = 19;
     Unlock unlock = 20;
+    KernelLoadModule kernel_load_module = 21;
+    KernelUnloadModule kernel_unload_module = 22;
   };
   optional uint64 period_us = 15 [default = 0];
   optional uint64 offset_us = 18 [default = 0];
