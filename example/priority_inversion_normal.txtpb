@@ -29,23 +29,17 @@ main: {
         }
         sched_affinity: 1
         sched_attr: {
-          rt: {
-            policy: FIFO
-            priority: 99
+          other: {
+            policy: OTHER
+            nice: -20
           }
         }
       },
       {
         name: "Mid"
         instruction: {
-          instruction_set: {
-            instructions: [
-              {
-                cpu_work: {
-                  duration_us: 10000
-                }
-              }
-            ]
+          cpu_work: {
+            duration_us: 10000
           }
           repeat: 100
           period_us: 30000
@@ -53,9 +47,9 @@ main: {
         }
         sched_affinity: 1
         sched_attr: {
-          rt: {
-            policy: FIFO
-            priority: 98
+          other: {
+            policy: OTHER
+            nice: 0
           }
         }
       },
@@ -87,9 +81,9 @@ main: {
         }
         sched_affinity: 1
         sched_attr: {
-          rt: {
-            policy: FIFO
-            priority: 97
+          other: {
+            policy: OTHER
+            nice: 19
           }
         }
       }

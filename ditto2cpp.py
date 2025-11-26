@@ -20,12 +20,12 @@ import argparse
 def fetch_arguments():
   parser = argparse.ArgumentParser(
       prog="ditto2cpp",
-      description="Translate .ditto file to C++ source files to embed in the benchmark."
+      description="Translate .txtpb file to C++ source files to embed in the benchmark."
   )
   parser.add_argument("-o", "--output", required=True, help="Output file",
                       type=str)
   parser.add_argument("-s", "--sources", required=True, nargs='+',
-                      help="Source .ditto files", type=str)
+                      help="Source .txtpb files", type=str)
   parser.add_argument("-v", "--verbose", help="Verbose output",
                       action='store_true')
   args = parser.parse_args()
@@ -64,7 +64,7 @@ def generate_benchmark_source(output, sources):
     # This happens when '/' cannot be found in `common_prefix`
     pass
   prefix_length = min(len(common_prefix), last_slash_in_prefix)
-  suffix_length = len(".ditto")
+  suffix_length = len(".txtpb")
 
   file_header = '''
    #include <ditto/embedded_benchmarks.h>

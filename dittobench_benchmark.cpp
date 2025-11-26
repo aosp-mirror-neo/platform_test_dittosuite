@@ -68,9 +68,9 @@ void BM_DittoBench(benchmark::State& state, Args&&... args) {
   }
 }
 
-BENCHMARK_CAPTURE(BM_DittoBench, read_random_native, "example/android/read_random_native.ditto")->UseManualTime();
-BENCHMARK_CAPTURE(BM_DittoBench, read_random_fuse, "example/android/read_random_fuse.ditto")->UseManualTime();
-BENCHMARK_CAPTURE(BM_DittoBench, write_random_native, "example/android/write_random_native.ditto")->UseManualTime();
-BENCHMARK_CAPTURE(BM_DittoBench, write_random_fuse, "example/android/write_random_fuse.ditto")->UseManualTime();
+BENCHMARK_CAPTURE(BM_DittoBench, read_random_native, "example/android/read_random_native.txtpb")->UseManualTime();
+BENCHMARK_CAPTURE(BM_DittoBench, read_random_fuse, "example/android/read_random_fuse.txtpb")->UseManualTime();
+BENCHMARK_CAPTURE(BM_DittoBench, write_random_native, "example/android/write_random_native.txtpb")->UseManualTime();
+BENCHMARK_CAPTURE(BM_DittoBench, write_random_fuse, "example/android/write_random_fuse.txtpb")->UseManualTime();
 
 BENCHMARK_MAIN();

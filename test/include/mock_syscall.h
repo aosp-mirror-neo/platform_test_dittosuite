@@ -75,4 +75,6 @@ class MockSyscall : public dittosuite::SyscallInterface {
   MOCK_METHOD(int64_t, Write, (int fd, char* buf, int64_t count, int64_t offset), (override));
   MOCK_METHOD(int, LockMutex, (pthread_mutex_t*), (override));
   MOCK_METHOD(int, UnlockMutex, (pthread_mutex_t*), (override));
+  MOCK_METHOD(int, FinitModule, (int fd, const char* param_values, int flags), (override));
+  MOCK_METHOD(int, DeleteModule, (const char* name, int flags), (override));
 };
